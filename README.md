@@ -145,3 +145,38 @@ por sí solo no ejecuta JavaScript.
   https://www.selenium.dev/documentation/
 
 Fuentes consultadas el 25 de octubre de 2026.
+
+## Gestión de versiones con Git y GitHub
+
+El proyecto utiliza Git para controlar los cambios y GitHub como repositorio
+remoto. La rama `main` contiene la versión estable. Los cambios nuevos deben
+realizarse en ramas descriptivas, por ejemplo `feature/pruebas-unitarias`, y
+integrarse mediante un pull request. Antes de fusionar se recomienda ejecutar:
+
+```bash
+python -m unittest discover -v
+```
+
+Se pueden crear versiones etiquetadas cuando una versión estable esté lista:
+
+```bash
+git tag -a v1.0.0 -m "Versión 1.0.0"
+git push origin v1.0.0
+```
+
+## Integración y entrega continua
+
+El flujo ubicado en `.github/workflows/ci.yml` se ejecuta automáticamente ante
+push a `main`, creación de tags `v*` y pull requests. Sus etapas son:
+
+1. Descargar el repositorio.
+2. Instalar Python 3.11 y 3.12.
+3. Instalar las dependencias de `requirements.txt`.
+4. Validar la sintaxis del scraper y sus pruebas.
+5. Ejecutar las pruebas unitarias.
+6. Crear y publicar un artefacto comprimido del proyecto en cada entrega exitosa
+   desde `main` o desde un tag.
+
+Los resultados quedan registrados en la pestaña **Actions** de GitHub. Para
+descargar el paquete generado, abrir la ejecución correcta y utilizar la
+sección **Artifacts**.
