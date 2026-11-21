@@ -1,0 +1,147 @@
+# Documentación del proyecto
+
+## Introducción
+
+Este proyecto desarrolla un scraper educativo para recopilar información pública
+de un producto publicado en AliExpress. El artículo seleccionado es un aspirador
+inalámbrico para automóvil, identificado por el código `1005009259589970`.
+
+El programa obtiene el título, el precio mostrado en la página y la fecha y hora
+en que se realiza la extracción, expresada en UTC. Los resultados se presentan
+en la terminal y se guardan en un archivo CSV para facilitar su consulta y
+análisis posterior.
+
+Para el proceso se emplean tres herramientas de Python: Selenium carga la página
+en un navegador y permite obtener contenido que se genera dinámicamente;
+BeautifulSoup analiza el HTML para localizar los datos; y Scrapy está disponible
+como alternativa para realizar solicitudes y exportar resultados. Como la
+página carga su información dinámicamente, Selenium es el motor predeterminado
+del proyecto.
+
+El scraper tiene fines académicos. Su uso debe respetar las condiciones de
+AliExpress, sus políticas de acceso y las limitaciones establecidas por el sitio.
+
+## Descripción de la página y artículo a analizar
+
+AliExpress es una plataforma de comercio electrónico donde distintos vendedores
+publican productos para su venta. Las fichas de producto pueden mostrar
+información como el nombre del artículo, el precio, imágenes, características y
+disponibilidad. Parte del contenido se carga dinámicamente en el navegador, por
+lo que la respuesta HTML inicial puede no incluir todos los datos visibles.
+
+El artículo seleccionado es un aspirador inalámbrico para automóvil, con el
+código de producto `1005009259589970`. La página individual analizada es:
+
+`https://www.aliexpress.com/item/1005009259589970.html`
+
+En la ficha inspeccionada, el título describe un aspirador portátil de 9000 Pa,
+con carga USB y uso para limpieza del automóvil y el hogar. También se encontró
+la marca HAOYUNMA en los datos estructurados de la página. Durante una ejecución
+de prueba, el precio mostrado fue de 33 740 COP; este valor es variable y puede
+cambiar según la fecha, la región, las promociones o las opciones seleccionadas.
+
+El enlace original de ofertas incluía este identificador en el parámetro
+`productIds`, pero al abrirlo directamente respondió con una página 404. Por
+ello, el análisis se realiza sobre la ficha individual construida con el código
+del artículo.
+
+## Tema de interés de la primera práctica
+
+El tema de interés es la extracción automatizada de información pública de
+productos publicados en plataformas de comercio electrónico. En esta primera
+práctica se aplican herramientas de scraping para identificar y recopilar datos
+concretos —el título, el precio y la fecha de extracción— de una ficha de
+AliExpress.
+
+La práctica también permite reconocer cómo se presenta el contenido de una
+página web y comparar el papel de BeautifulSoup, Selenium y Scrapy en la
+obtención de datos. En particular, se observa que las páginas con contenido
+dinámico pueden requerir la carga de un navegador antes de analizar su HTML.
+El resultado se guarda en CSV para que los datos puedan revisarse y utilizarse
+en ejercicios posteriores de organización y análisis.
+
+## Objetivos
+
+### Objetivo general
+
+Analizar un artículo publicado en AliExpress mediante técnicas de scraping para
+comprender cómo se obtiene y organiza información pública de un producto en una
+plataforma de comercio electrónico.
+
+### Objetivos específicos
+
+- Identificar información relevante del aspirador seleccionado, como su título
+  y precio, para conocer cómo se presenta la oferta al consumidor.
+- Aplicar Selenium, BeautifulSoup y Scrapy para explorar distintas formas de
+  cargar una página y extraer información de su contenido.
+- Guardar los datos recopilados en un archivo CSV y mostrarlos en la terminal,
+  de modo que puedan consultarse y analizarse posteriormente.
+- Reconocer las características del contenido dinámico y las limitaciones de
+  acceso que pueden influir en la extracción de datos de AliExpress.
+
+## Metodología empleada de scraping
+
+La extracción se realizó sobre la ficha individual del producto identificado
+con el código `1005009259589970`. Se utilizó Selenium como motor de navegación,
+ya que el contenido de la página se carga dinámicamente. Una vez abierta la
+ficha, el programa espera a que aparezcan el título y el elemento del precio en
+la página antes de continuar.
+
+Con la página cargada, se entrega su HTML a BeautifulSoup, que busca el título
+en el encabezado principal (`h1`) y el precio en los datos estructurados
+JSON-LD. Si esos datos no están disponibles, se consultan metadatos y elementos
+HTML del precio. El programa también agrega la fecha y hora UTC de la consulta.
+
+Finalmente, el resultado se imprime en la terminal y se almacena en
+`articulo.csv`, con las columnas `titulo`, `precio` y `fecha_extraccion`. Scrapy
+está incluido como opción de solicitud y exportación, pero la ejecución usada
+para obtener el resultado reportado se hizo con Selenium y BeautifulSoup. No se
+usa Scrapy para ejecutar JavaScript; por ello, puede no obtener los mismos
+datos dinámicos de esta página.
+
+La extracción depende del contenido que AliExpress entregue al momento de la
+consulta. El precio puede variar y el sitio puede modificar su estructura,
+mostrar verificaciones o limitar solicitudes; el proceso no intenta evadir
+esas restricciones.
+
+## Resultados
+
+La ejecución de prueba con Selenium y BeautifulSoup identificó el producto y
+generó el archivo `articulo.csv`. El registro guardado contiene:
+
+- **Título:** Aspirador de coche inalámbrico de 9000Pa, dispositivo de limpieza
+  portátil con carga USB de 1200mAh, Mini aspirador húmedo y seco para el hogar.
+- **Precio observado:** 33740 COP.
+- **Fecha de extracción:** 2026-10-25 18:45:09 UTC.
+
+El precio corresponde a una observación durante la prueba, no a un valor
+permanente. Puede cambiar según la fecha, la región, las promociones y las
+opciones disponibles en la ficha.
+
+## Conclusiones
+
+La práctica permitió extraer y organizar el título y el precio de un producto
+de AliExpress utilizando Selenium para cargar el contenido dinámico y
+BeautifulSoup para analizar su HTML. El resultado quedó disponible tanto en la
+terminal como en un archivo CSV, lo que facilita su consulta posterior.
+
+También se comprobó que el enlace de ofertas no siempre conduce directamente a
+la información del producto y que puede ser necesario utilizar la ficha
+individual. La extracción web depende de la respuesta y estructura actuales del
+sitio; por tanto, los selectores y el resultado deben verificarse cada vez que
+se ejecute el programa. Scrapy se conserva como herramienta alternativa, aunque
+por sí solo no ejecuta JavaScript.
+
+## Bibliografía
+
+- AliExpress. (s. f.). *Aspirador de coche inalámbrico de 9000 Pa* [ficha del
+  producto, código 1005009259589970].
+  https://www.aliexpress.com/item/1005009259589970.html
+- Beautiful Soup. (s. f.). *Beautiful Soup Documentation*.
+  https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+- Scrapy. (s. f.). *Scrapy Documentation*.
+  https://docs.scrapy.org/en/latest/
+- Selenium. (s. f.). *Selenium Documentation*.
+  https://www.selenium.dev/documentation/
+
+Fuentes consultadas el 25 de octubre de 2026.
