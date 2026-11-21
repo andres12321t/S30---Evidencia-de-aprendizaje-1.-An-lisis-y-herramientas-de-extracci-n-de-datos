@@ -198,11 +198,15 @@ Para probar la aplicación localmente, instalar las dependencias y ejecutar:
 
 ```bash
 python -m pip install -r requirements.txt
-python -m flask --app app run
+python app.py
 ```
 
 Luego se puede abrir `http://127.0.0.1:5000`. El endpoint
 `http://127.0.0.1:5000/health` debe responder con `{"status":"ok"}`.
+También se puede iniciar con `python -m flask --app app run`. No se debe abrir
+`templates/index.html` directamente ni servirlo con Live Server: es una
+plantilla Jinja que Flask debe procesar para reemplazar los datos y cargar los
+estilos.
 
 El workflow ejecuta las pruebas primero. Después, para los cambios recibidos en
 `main` o cuando se ejecuta manualmente, activa el despliegue en Render mediante

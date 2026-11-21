@@ -90,6 +90,11 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"status": "ok"})
 
+    def test_stylesheet_is_served(self):
+        with self.client.get("/static/style.css") as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b".product-card", response.data)
+
     def test_homepage_reports_unavailable_csv(self):
         self.csv_path.unlink()
 
