@@ -7,6 +7,7 @@ on:
     tags:
       - "v*"
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -36,10 +37,34 @@ jobs:
         run: python -m pip install --upgrade pip && pip install -r requirements.txt
 
       - name: Comprobar sintaxis
-        run: python -m compileall -q scraper.py test_scraper.py
+        run: python -m compileall -q scraper.py app.py test_scraper.py
 
       - name: Ejecutar pruebas
         run: python -m unittest discover -v
+
+  desplegar:
+    name: Desplegar en Render
+    needs: validar
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Informar si el despliegue aún no está configurado
+        if: vars.RENDER_DEPLOY_ENABLED != 'true'
+        run: |
+          echo "::warning::Despliegue omitido. Configura RENDER_DEPLOY_ENABLED=true y el secreto RENDER_DEPLOY_HOOK_URL."
+          echo "## Despliegue en Render pendiente de configuración" >> "$GITHUB_STEP_SUMMARY"
+          echo "Añade la variable de repositorio \`RENDER_DEPLOY_ENABLED=true\` y el secreto \`RENDER_DEPLOY_HOOK_URL\` para activar el despliegue." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Activar despliegue en Render
+        if: vars.RENDER_DEPLOY_ENABLED == 'true'
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::error::Falta el secreto RENDER_DEPLOY_HOOK_URL en la configuración del repositorio."
+            exit 1
+          fi
+          curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
 
   publicar:
     name: Publicar paquete
@@ -55,8 +80,10 @@ jobs:
 
       - name: Preparar paquete
         run: |
-          mkdir paquete
-          cp README.md requirements.txt scraper.py articulo.csv paquete/
+          mkdir -p paquete/templates paquete/static
+          cp README.md requirements.txt scraper.py app.py articulo.csv render.yaml paquete/
+          cp templates/index.html paquete/templates/
+          cp static/style.css paquete/static/
           tar -czf scraper-evidencia.tar.gz -C paquete .
 
       - name: Guardar artefacto de despliegue

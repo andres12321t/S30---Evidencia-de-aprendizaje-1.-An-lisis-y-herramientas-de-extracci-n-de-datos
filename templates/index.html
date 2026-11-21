@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Consulta del último registro extraído del producto seleccionado.">
+    <title>Producto analizado | Evidencia de scraping</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="page">
+      <header class="intro">
+        <p class="eyebrow">Proyecto de extracción de datos</p>
+        <h1>Producto analizado</h1>
+        <p class="lead">Último registro guardado por el scraper educativo.</p>
+      </header>
+
+      <section class="product-card" aria-labelledby="product-title">
+        <p class="label">AliExpress · Aspirador portátil</p>
+        <h2 id="product-title">{{ product["titulo"] }}</h2>
+        <dl class="details">
+          <div>
+            <dt>Precio observado</dt>
+            <dd>{{ product["precio"] }}</dd>
+          </div>
+          <div>
+            <dt>Fecha de extracción (UTC)</dt>
+            <dd>{{ product["fecha_extraccion"] }}</dd>
+          </div>
+        </dl>
+        <a class="product-link" href="{{ product_url }}" target="_blank" rel="noopener noreferrer">
+          Consultar ficha del producto
+        </a>
+        <p class="notice">El precio es una observación y puede variar según la fecha, la región y las promociones.</p>
+      </section>
+
+      <footer>Datos cargados desde el archivo articulo.csv del proyecto.</footer>
+    </main>
+  </body>
+</html>

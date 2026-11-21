@@ -180,3 +180,42 @@ push a `main`, creación de tags `v*` y pull requests. Sus etapas son:
 Los resultados quedan registrados en la pestaña **Actions** de GitHub. Para
 descargar el paquete generado, abrir la ejecución correcta y utilizar la
 sección **Artifacts**.
+
+## Aplicación web y despliegue en Render
+
+El proyecto incluye una aplicación web sencilla en Flask que presenta el último
+registro de `articulo.csv`: título, precio observado, fecha de extracción y un
+enlace a la ficha del producto. La aplicación solo consulta el CSV existente;
+no realiza solicitudes de scraping cada vez que una persona abre la página.
+El endpoint `/health` permite verificar que el servicio esté disponible.
+
+El archivo `render.yaml` define el servicio web, el comando de instalación y
+arranque con Gunicorn y la ruta de comprobación de salud. Para crear el servicio,
+se debe conectar el repositorio en Render y elegir la opción **New Blueprint
+Instance**.
+
+Para probar la aplicación localmente, instalar las dependencias y ejecutar:
+
+```bash
+python -m pip install -r requirements.txt
+python -m flask --app app run
+```
+
+Luego se puede abrir `http://127.0.0.1:5000`. El endpoint
+`http://127.0.0.1:5000/health` debe responder con `{"status":"ok"}`.
+
+El workflow ejecuta las pruebas primero. Después, para los cambios recibidos en
+`main` o cuando se ejecuta manualmente, activa el despliegue en Render mediante
+un deploy hook. Para habilitar esa etapa:
+
+1. En Render, crear el servicio usando el Blueprint del repositorio.
+2. En la configuración del servicio de Render, copiar su URL de deploy hook.
+3. En GitHub, abrir **Settings > Secrets and variables > Actions**.
+4. Agregar el hook como el secreto `RENDER_DEPLOY_HOOK_URL`.
+5. Agregar la variable de repositorio `RENDER_DEPLOY_ENABLED` con el valor
+   `true`.
+
+La URL del hook es confidencial; debe guardarse como secreto y no incluirse en
+el código ni en los registros. Hasta que se configuren el servicio y estas dos
+variables, GitHub Actions informa que el despliegue está pendiente y no lo
+ejecuta.

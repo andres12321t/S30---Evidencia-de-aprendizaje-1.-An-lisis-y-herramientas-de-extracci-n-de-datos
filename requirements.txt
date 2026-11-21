@@ -1,3 +1,5 @@
 beautifulsoup4
 selenium
 Scrapy
+Flask
+gunicorn

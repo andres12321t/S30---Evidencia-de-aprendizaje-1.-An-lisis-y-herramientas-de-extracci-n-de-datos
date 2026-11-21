@@ -2,6 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from app import create_app
 from scraper import _jsonld_price, parse_product, save_csv
 
 
@@ -59,6 +60,42 @@ class ScraperTests(unittest.TestCase):
             self.assertIn("titulo,precio,fecha_extraccion", content)
             self.assertIn("Producto de prueba", content)
             self.assertIn("45999 COP", content)
+
+
+class WebAppTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.csv_path = Path(self.directory.name) / "articulo.csv"
+        self.csv_path.write_text(
+            "titulo,precio,fecha_extraccion\n"
+            "Producto de prueba,45999 COP,2026-11-21T16:30:00+00:00\n",
+            encoding="utf-8",
+        )
+        self.client = create_app(self.csv_path).test_client()
+
+    def tearDown(self):
+        self.directory.cleanup()
+
+    def test_homepage_displays_product_from_csv(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Producto de prueba", response.data)
+        self.assertIn(b"45999 COP", response.data)
+        self.assertIn(b"2026-11-21T16:30:00+00:00", response.data)
+
+    def test_health_endpoint_returns_ok(self):
+        response = self.client.get("/health")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {"status": "ok"})
+
+    def test_homepage_reports_unavailable_csv(self):
+        self.csv_path.unlink()
+
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 503)
 
 
 if __name__ == "__main__":
